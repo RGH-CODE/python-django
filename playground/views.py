@@ -2,24 +2,26 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
 from store.models import Product
-# Create your views here.
-#it is plain text 
-
-#     return HttpResponse("Hello Rajesh")
-#this is render using template
-#retrieving objects methods
-#1.objects.all
-# def htmlRender(request):
-#     query_set=Product.objects.all()
-#     for product in query_set:
-#         print(product)
-#     return render(request,'hello.html',{'name':'Rajesh'})
-#2.objects.get(pk=1) django selects pk as id
+#filtering methods
 def htmlRender(request):
-    try:
-       query_set=Product.objects.get(pk=0) #if i provide invalid id/pk then get method returns error so to handle this we wrap this in exception handling
-    except ObjectDoesNotExist:
-        print("Object not found!!")
-    return render(request,'hello.html',{'name':'Rajesh'})
+    #1.get objects having price range b/w 20-30
+    #->queryset=Product.objects.filter(unit_price__range=(20,30))
     
+    #2.get product that has greater than one collection
+    #->queryset=Product.objects.filter(collection__id__gt=1)
+    
+    #3.get products that title starts with coffee
+    #->queryset=Product.objects.filter(title__icontains="coffee")#icontains to make case insensitive
+    
+    #4.get products that title starts with letter m
+    #-> queryset=Product.objects.filter(title__istartswith="m")
+    
+    #5.
+    #queryset=Product.objects.filter(last_update__year=2021)
+     
+    #6.to check product without description
+    queryset = Product.objects.filter(description__isnull=True)
+
+   
+    return render(request,'hello.html',{'name':'Rajesh','products':list(queryset)})
     

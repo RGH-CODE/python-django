@@ -6,5 +6,10 @@
     {% else %}
     <h1>Name is not passed so saw you this message</h1>
     {%endif%}
+    <ul>
+      {% for product in products%}
+      <li>{{product.title}}</li>
+      {% endfor %}
+    </ul>
   </body>
 </html>
