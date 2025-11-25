@@ -5,20 +5,13 @@ from django.db.models import Q,F
 from store.models import Product,OrderItem
 
 def htmlRender(request):
-   #Selecting flields to query
-    #1.we get id and title in dictionary from
-    queryset=Product.objects.values('id','title')
-
-    #1.we get id and title and title of collection  in dictionary from
-    queryset=Product.objects.values('id','title','collection__title')
-
-    #1.we get id and title and title of collection  in tuple from
-    queryset=Product.objects.values_list('id','title','collection__title')
-
-    #.Select products that have been order and sort them by title
-    queryset=Product.objects.filter(id__in=OrderItem.objects.values('product_id').distinct()).order_by('title')
-
-
+   #selecting related objects:select_related(for one instance relationship)
+    #1.it selects the query from product with collection.this select_related prevents from generating extra query
+    #Note select_related is used for one instance relation ie here product has one collection.
+    queryset=Product.objects.select_related('collection').all()
+   #2.to expand relation we use:
+    #queryset=Product.objects.select_related('collection__SomeOtherField').all()
+   
 
     return render(request,'hello.html',{'name':'Rajesh','products':list(queryset)})
     
