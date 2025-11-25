@@ -1,17 +1,14 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Q
+from django.db.models import Q,F
 from store.models import Product
 #filtering methods
 def htmlRender(request):
-   #complex filter/lookups using Q objects
-   #1.products:inventory<10 or unit price <20
-    queryset = Product.objects.filter(Q(inventory__lt=10) | Q(unit_price__lt=20))
-    
-    #2.products:inventory<10 and  unit price not <20
-    queryset = Product.objects.filter(Q(inventory__lt=10) & ~Q(unit_price__lt=20))
-
-   
+   #Referencing Fileds Using F objects
+    #1.products has has same inventory number as unit price 
+    queryset=Product.objects.filter(inventory=F('unit_price'))
+     #2.products has has same inventory number as collection id 
+    queryset=Product.objects.filter(inventory=F('collection__id'))
     return render(request,'hello.html',{'name':'Rajesh','products':list(queryset)})
     
