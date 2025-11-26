@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Q,F,Value,Func
+from django.db.models import Q,F,Value,Func,Count,ExpressionWrapper,DecimalField
 from django.db.models.functions import Concat 
 from store.models import Product,OrderItem,Order,Customer
 
@@ -23,6 +23,16 @@ def htmlRender(request):
     
     #shortcut way of concatinating using cancat function
     queryset=Customer.objects.annotate(full_name=Concat('first_name',Value(' '), 'last_name'))
+    
+    #Grouping Data
+    queryset=Customer.objects.annotate(order_count=Count('order'))
+    
+    
+    #ExpressionWrapper()
+    #queryset=Product.objects.annotate(discounted_price=F('unit_price')*0.8) #we get error of expression mixed of float and decimal
+    #->expression wrapper is used to solve the mixed expression problem like float and decimal
+    
+    queryset=Product.objects.annotate(discounted_price=ExpressionWrapper(F('unit_price')*0.8,output_field=DecimalField()))
 
     return render(request,'hello.html',{'name':'Rajesh','orders':list(queryset)})
     
