@@ -7,8 +7,13 @@
     <h1>Name is not passed so saw you this message</h1>
     {%endif%}
     <ul>
-      {% for product in products%}
-      <li>{{product.title}}-{{product.collection.title}}</li>
+      {% for order in orders%}
+      <li>
+        <h1>
+          {{order.id}} -
+          {{order.customer.first_name}}-{{order.customer.membership}}-{{order.customer.phone}}
+        </h1>
+      </li>
       {% endfor %}
     </ul>
   </body>

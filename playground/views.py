@@ -2,13 +2,12 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q,F
-from store.models import Product,OrderItem
+from store.models import Product,OrderItem,Order
 
 def htmlRender(request):
-   #selecting related objects:prefetch_related(for many instance relationship) and select_related(for one instance)ie combine selection of objects
-   
-    queryset=Product.objects.prefetch_related('promotions').select_related('collection').all()
+    #Get the last 5 orders with their customer and items(including products)
+    queryset=Order.objects.select_related('customer').prefetch_related('orderitem_set__product').order_by('-placed_at')[:5]
    
 
-    return render(request,'hello.html',{'name':'Rajesh','products':list(queryset)})
+    return render(request,'hello.html',{'name':'Rajesh','orders':list(queryset)})
     
