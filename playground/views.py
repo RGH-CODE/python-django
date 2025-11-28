@@ -3,21 +3,31 @@ from django.http import HttpResponse
 from django.contrib.contenttypes.models import ContentType
 from store.models import Product,Collection,Order,OrderItem
 from django.db import transaction
+from django.db import connection 
 from tag.models import TagItem
 
 def htmlRender(request):
-    #Transaction: to to execute two seperate logic/code and if one fails leads to both fail .and prevents us from unnecessary orders/error/
-    #;;........let here is code that does not related to ordering product
-    with transaction.atomic():
-        order=Order()
-        order.customer_id=1
-        order.save()
+    #Executing Rw sql queries
+    #1.method one 
+    #->queryset=Product.objects.raw('SELECT * FROM store_product') #for all fields
+    #->queryset=Product.objects.raw('SELECT id,title FROM store_product') #for all fields
+    
+    # #2.method two 
+    # cursor=connection.cursor()
+    # cursor.execute('SELECT id,title FROM store_product')
+    # cursor.close()
+    
+    # #3.method three:it closes cursor automatically 
+    # with Connection.cursor() as cursor:
+    #     cursor.execute('SELECT id,title FROM store_product')
         
-        item=OrderItem()
-        item.order=order
-        item.product_id=1
-        item.quantity=1
-        item.unit_price=10
-        item.save()
-    return render(request,'hello.html',{'name':'Rajesh'})
+    #4.for store prodcedure :using callproc procedure
+    with Connection.cursor() as cursor:
+        cursor.callProc('get_customer',[1,2])
+        #it does not support in pymysql
+    
+    return render(request,'hello.html',{'name':'Rajesh','result':list(queryset)})
+    
+    
+    
     
