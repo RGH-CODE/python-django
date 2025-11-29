@@ -22,12 +22,12 @@ def htmlRender(request):
     #     cursor.execute('SELECT id,title FROM store_product')
         
     #4.for store prodcedure :using callproc procedure
-    with Connection.cursor() as cursor:
-        cursor.callProc('get_customer',[1,2])
+    # with connection.cursor() as cursor:
+    #     cursor.callProc('get_customer',[1,2])
         #it does not support in pymysql
     
     return render(request,'hello.html',{'name':'Rajesh','result':list(queryset)})
     
-    
+      
     
     
