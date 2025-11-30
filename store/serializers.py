@@ -12,14 +12,8 @@ class ProductSerializer(serializers.Serializer):
     #creating custom serializers fields
     price_with_tax=serializers.SerializerMethodField(method_name='calculate_tax')
     
-    #1.method one of serializing relationship which returns collection id/int
-    #->collection=serializers.PrimaryKeyRelatedField(queryset=Collection.objects.all())
-    
-    #2.method two serializing relationship which returns collection title
-    #->collection=serializers.StringRelatedField() #takes long load so go to views.product_list->queryset and add select_related('collection)
-    
-    #3.method third using collection serializers
-    collection=CollectionSerializer()
+    #serializing using hyperlink:
+    collection=serializers.HyperlinkedRelatedField(queryset=Collection.objects.all(),view_name="collection-detail")
     def calculate_tax(self,product:Product):
         return product.unit_price * Decimal(1.1)
     
