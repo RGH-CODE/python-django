@@ -11,12 +11,16 @@ from . serializers import  ProductSerializer,CollectionSerializer
 #This is django response
     #return HttpResponse('ok')
 #better to use rest framework reponse which is better 
-@api_view()
+@api_view(['GET','POST'])
 def product_list(request):
-    queryset=Product.objects.select_related('collection').all()
-    serializer=ProductSerializer(queryset,many=True,context={'request':request})
-    return Response(serializer.data)
-       
+    if request.method=='GET':
+      queryset=Product.objects.select_related('collection').all()
+      serializer=ProductSerializer(queryset,many=True,context={'request':request})
+      return Response(serializer.data)
+    elif request.method=='POST':
+        serializer=ProductSerializer(data=request.data) 
+        return Response('ok the data is deserialized!!')
+         
     
 
 # @api_view()
@@ -36,8 +40,12 @@ def product_detail(request,id):
     serializer=ProductSerializer(product)
     return Response(serializer.data)
 
-@api_view()
+@api_view(['GET','POST'])
 def collection_detail(request,pk):
-    collection=get_object_or_404(Collection,pk=pk)
-    serializer=CollectionSerializer(collection)
-    return Response(serializer.data)
+    if request.method=='GET':
+      collection=get_object_or_404(Collection,pk=pk)
+      serializer=CollectionSerializer(collection)
+      return Response(serializer.data)
+    elif request.method=='POST':
+        serializer=CollectionSerializer(data=request.data)
+        return Response('collection is added!!')
