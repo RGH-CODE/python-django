@@ -30,7 +30,7 @@ def product_list(request):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         # return Response(serializer.data,status=status.HTTP_201_CREATED)
-        return Response("ok")
+        return Response(serializer.data)
 
 
 # @api_view()
@@ -44,11 +44,18 @@ def product_list(request):
     #     #best way to do 
     #     return Response(status=status.HTTP_404_NOT_FOUND)
 #but using try and catch for all time might be long so use django shortcuts
-@api_view()
+@api_view(["GET",'PUT'])
 def product_detail(request,id):
     product=get_object_or_404(Product,pk=id)
-    serializer=ProductSerializer(product)
-    return Response(serializer.data)
+    if request.method=="GET":
+      serializer=ProductSerializer(product,context={'request': request})
+      return Response(serializer.data)
+    elif request.method=="PUT":
+      serializer=ProductSerializer(product,context={'request': request},data=request.data)
+      serializer.is_valid(raise_exception=True)
+      serializer.save()
+      return Response(serializer.data)
+        
 
 @api_view(['GET','POST'])
 def collection_detail(request,pk):
