@@ -19,9 +19,19 @@ def product_list(request):
       return Response(serializer.data)
     elif request.method=='POST':
         serializer=ProductSerializer(data=request.data) 
-        return Response('ok the data is deserialized!!')
-         
-    
+        #method 1 of checking validation of data
+        # if serializer.is_valid():
+        #     serializer.validated_data
+        #     return Response('ok the data is deserialized!!')
+        # else:
+        #     return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST) #now if invalid data is posted then we get proper error
+        
+         #method 2 of checking validation of data
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        # return Response(serializer.data,status=status.HTTP_201_CREATED)
+        return Response("ok")
+
 
 # @api_view()
 # def product_detail(request,id):

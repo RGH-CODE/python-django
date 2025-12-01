@@ -9,7 +9,7 @@ class CollectionSerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model=Product
-        fields=['id','title','price','price_with_tax','collection']
+        fields=['id','title','description','slug','inventory','price','price_with_tax','collection','collection_url']
     #since id and title are same name in product model they can be removed from here 
     price=serializers.DecimalField(max_digits=6,decimal_places=2,source='unit_price') #price name is not in product model so need to define here  
    
@@ -19,5 +19,5 @@ class ProductSerializer(serializers.ModelSerializer):
     def calculate_tax(self,product:Product):
         return product.unit_price * Decimal(1.1)
     #serializing using hyperlink:
-    collection=serializers.HyperlinkedRelatedField(queryset=Collection.objects.all(),view_name="collection-detail") #it is kept here cause we want collection in hyperlink form.But we can remove it if we want collection in primary key from
-    
+    collection_url=serializers.HyperlinkedRelatedField(source='collection',view_name="collection-detail",read_only=True) #it is kept here cause we want collection in hyperlink form.But we can remove it if we want collection in primary key from
+    collection = serializers.PrimaryKeyRelatedField(queryset=Collection.objects.all(),write_only=True)#for posting collection in pk/integer 

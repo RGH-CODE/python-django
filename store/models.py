@@ -13,7 +13,7 @@ class Promotion(models.Model):
 class Product(models.Model):
     title=models.CharField(max_length=250)
     slug=models.SlugField()
-    description=models.TextField()
+    description=models.TextField(null=True,blank=True)
     unit_price=models.DecimalField(max_digits=6,decimal_places=2)
     inventory=models.IntegerField()
     last_update=models.DateTimeField(auto_now=True)
