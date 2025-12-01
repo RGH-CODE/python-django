@@ -4,7 +4,7 @@ from . models import Product,Customer,Collection
 class CollectionSerializer(serializers.ModelSerializer):
     class Meta:
         model=Collection
-        fields=['id','title','featured_product']
+        fields=['id','title']
     
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:

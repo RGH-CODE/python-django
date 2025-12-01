@@ -44,7 +44,7 @@ def product_list(request):
     #     #best way to do 
     #     return Response(status=status.HTTP_404_NOT_FOUND)
 #but using try and catch for all time might be long so use django shortcuts
-@api_view(["GET",'PUT'])
+@api_view(["GET",'PUT','DELETE'])
 def product_detail(request,id):
     product=get_object_or_404(Product,pk=id)
     if request.method=="GET":
@@ -55,14 +55,37 @@ def product_detail(request,id):
       serializer.is_valid(raise_exception=True)
       serializer.save()
       return Response(serializer.data)
+    elif request.method=="DELETE":
+      if product.orderitems.count()>0:
+        return Response({'error':'This product can not be deleted cause it is related with order item'},status=status.HTTP_405_METHOD_NOT_ALLOWED)
+      product.delete()
+      return Response({'Success':'Product deleted successfully'},status=status.HTTP_204_NO_CONTENT)
         
 
-@api_view(['GET','POST'])
+@api_view(["GET","POST"])
+def collection_list(request):
+  if request.method=="GET":
+    queryset=Collection.objects.all()
+    serializer=CollectionSerializer(queryset,many=True)
+    return Response(serializer.data)
+    
+  elif request.method=="POST":
+    serializer=CollectionSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+    return Response(serializer.data)
+
+@api_view(['GET','PUT','DELETE'])
 def collection_detail(request,pk):
+    collection=get_object_or_404(Collection,pk=pk)
     if request.method=='GET':
-      collection=get_object_or_404(Collection,pk=pk)
       serializer=CollectionSerializer(collection)
       return Response(serializer.data)
-    elif request.method=='POST':
-        serializer=CollectionSerializer(data=request.data)
-        return Response('collection is added!!')
+    elif request.method=='PUT':
+        serializer=CollectionSerializer(collection,data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+    elif request.method=='DELETE':
+      collection.delete()
+      return Response({f'Success':'collection {pk} is deleted successfully'},status=status.HTTP_204_NO_CONTENT)
