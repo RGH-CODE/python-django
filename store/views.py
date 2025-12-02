@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
+from django.db.models import Count
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -65,7 +66,7 @@ def product_detail(request,id):
 @api_view(["GET","POST"])
 def collection_list(request):
   if request.method=="GET":
-    queryset=Collection.objects.all()
+    queryset=Collection.objects.annotate(products_count=Count('products')).all()
     serializer=CollectionSerializer(queryset,many=True)
     return Response(serializer.data)
     
@@ -77,7 +78,7 @@ def collection_list(request):
 
 @api_view(['GET','PUT','DELETE'])
 def collection_detail(request,pk):
-    collection=get_object_or_404(Collection,pk=pk)
+    collection=get_object_or_404(Collection.objects.annotate(product_count=Count('products')),pk=pk)
     if request.method=='GET':
       serializer=CollectionSerializer(collection)
       return Response(serializer.data)
@@ -87,5 +88,7 @@ def collection_detail(request,pk):
         serializer.save()
         return Response(serializer.data)
     elif request.method=='DELETE':
+      if collection.products.count()>0:
+        return Response({'Error':'This collection cannot be deleted cause it contaions more than one product!!'},status=status.HTTP_405_METHOD_NOT_ALLOWED)
       collection.delete()
-      return Response({f'Success':'collection {pk} is deleted successfully'},status=status.HTTP_204_NO_CONTENT)
+      return Response({f'Success':'collection {id} is deleted successfully'},status=status.HTTP_204_NO_CONTENT)
