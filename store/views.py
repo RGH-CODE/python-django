@@ -6,7 +6,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
-from rest_framework.generics import ListCreateAPIView
+from rest_framework.generics import ListCreateAPIView,RetrieveUpdateDestroyAPIView
 from . models import Product,Customer,Collection
 from . serializers import  ProductSerializer,CollectionSerializer
 
@@ -35,31 +35,14 @@ class ProductList(ListCreateAPIView):
   
   
 #creating  class for class based view 
-# class ProductList(APIView):
-#   def get(self,request):
-#       queryset=Product.objects.select_related('collection').all()
-#       serializer=ProductSerializer(queryset,many=True,context={'request':request})
-#       return Response(serializer.data)
-#   def post(self,request):
-#       serializer=ProductSerializer(data=request.data) 
-#       serializer.is_valid(raise_exception=True)
-#       serializer.save()
-#       return Response(serializer.data)
 
-
-class ProductDetail(APIView):
-  def get(self,request,id):
-      product=get_object_or_404(Product,pk=id)
-      serializer=ProductSerializer(product,context={'request': request})
-      return Response(serializer.data)
-  def put(self,request,id):
-      product=get_object_or_404(Product,pk=id)
-      serializer=ProductSerializer(product,context={'request': request},data=request.data)
-      serializer.is_valid(raise_exception=True)
-      serializer.save()
-      return Response(serializer.data)
-  def delete(self,request,id):
-      product=get_object_or_404(Product,pk=id)
+#creating generic view for product detail using retrieveupdatedestroyapiview
+class ProductDetail(RetrieveUpdateDestroyAPIView):
+  queryset=Product.objects.all()
+  serializer_class=ProductSerializer
+  
+  def delete(self,request,pk):
+      product=get_object_or_404(Product,pk=pk)
       if product.orderitems.count()>0:
         return Response({'error':'This product can not be deleted cause it is related with order item'},status=status.HTTP_405_METHOD_NOT_ALLOWED)
       product.delete()
