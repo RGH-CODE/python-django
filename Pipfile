@@ -9,6 +9,7 @@ django-debug-toolbar = "*"
 pymysql = "*"
 cryptography = "*"
 djangorestframework = "*"
+drf-nested-routers = "*"
 
 [dev-packages]
 

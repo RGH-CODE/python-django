@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from decimal import Decimal
-from . models import Product,Customer,Collection
+from . models import Product,Customer,Collection,Review
 class CollectionSerializer(serializers.ModelSerializer):
     products_count=serializers.IntegerField(read_only=True)
     class Meta:
@@ -25,3 +25,16 @@ class ProductSerializer(serializers.ModelSerializer):
     #serializing using hyperlink:
     collection_url=serializers.HyperlinkedRelatedField(source='collection',view_name="collection-detail",read_only=True) #it is kept here cause we want collection in hyperlink form.But we can remove it if we want collection in primary key from
     collection = serializers.PrimaryKeyRelatedField(queryset=Collection.objects.all(),write_only=True)#for posting collection in pk/integer 
+
+
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Review
+        fields=['id','date','name','description']
+        
+        
+    def create(self,validated_data):
+            product_id=self.context['product_id']
+            return Review.objects.create(product_id=product_id,**validated_data)
