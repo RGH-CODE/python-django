@@ -6,10 +6,12 @@ name = "pypi"
 [packages]
 django = "*"
 django-debug-toolbar = "*"
-pymysql = "*"
 cryptography = "*"
 djangorestframework = "*"
 drf-nested-routers = "*"
+django-filter = "*"
+pymysql = "*"
+django-rest-framework-nested = "*"
 
 [dev-packages]
 
