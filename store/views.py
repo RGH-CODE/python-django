@@ -11,8 +11,11 @@ from rest_framework.viewsets import ModelViewSet
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter,OrderingFilter
 
-from . models import Product,Customer,Collection,OrderItem,Review
-from . serializers import  ProductSerializer,CollectionSerializer,ReviewSerializer
+from rest_framework.mixins import CreateModelMixin
+from rest_framework.viewsets import GenericViewSet
+
+from . models import Product,Customer,Collection,OrderItem,Review,Cart
+from . serializers import  ProductSerializer,CollectionSerializer,ReviewSerializer,CartSerializer
 from . filters import ProductFilter
 from . pagination import DefaultPagination
 
@@ -78,3 +81,9 @@ class ReviewViewSet(ModelViewSet):
   
   def get_serializer_context(self):
     return {'product_id':self.kwargs['product_pk']}
+  
+  
+#CARTVIEWSET
+class CartViewSet(CreateModelMixin,GenericViewSet):
+  queryset=Cart.objects.all()
+  serializer_class=CartSerializer
