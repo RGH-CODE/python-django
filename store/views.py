@@ -11,7 +11,7 @@ from rest_framework.viewsets import ModelViewSet
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter,OrderingFilter
 
-from rest_framework.mixins import CreateModelMixin
+from rest_framework.mixins import CreateModelMixin,RetrieveModelMixin
 from rest_framework.viewsets import GenericViewSet
 
 from . models import Product,Customer,Collection,OrderItem,Review,Cart
@@ -84,6 +84,7 @@ class ReviewViewSet(ModelViewSet):
   
   
 #CARTVIEWSET
-class CartViewSet(CreateModelMixin,GenericViewSet):
-  queryset=Cart.objects.all()
+class CartViewSet(CreateModelMixin,GenericViewSet,RetrieveModelMixin):
+  queryset=Cart.objects.prefetch_related('items__product').all()
   serializer_class=CartSerializer
+  
