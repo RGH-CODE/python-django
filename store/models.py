@@ -27,6 +27,14 @@ class Product(models.Model):
     last_update=models.DateTimeField(auto_now=True)
     collection=models.ForeignKey(Collection,on_delete=models.PROTECT,related_name="products") #one to many relationship with collection  to product class 
     promotions=models.ManyToManyField(Promotion)
+    
+    
+    def __str__(self)->str:
+        return self.title
+    
+    class Meta:
+        ordering=['title']
+    
 class Customer(models.Model):
     MEMBERSHIP_BRONZE='B'
     MEMBERSHIP_SILVER='S'
