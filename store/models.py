@@ -5,6 +5,13 @@ from django.core.validators import MinValueValidator
 class Collection(models.Model):
     title=models.CharField(max_length=255)
     featured_product=models.ForeignKey('Product',on_delete=models.SET_NULL,null=True,related_name='+')#we do 'Product' cause Product class in defined below this class but in comming future it is not going to rename easily to solve we created related_name='+' so that django does not create reverse relation between product and collection classes.
+    
+    def __str__(self)->str:
+        return self.title
+    
+    class Meta:
+        ordering=['title']
+    
 #many to many relationship between promotion-product 
 class Promotion(models.Model):
     description=models.CharField(max_length=255)

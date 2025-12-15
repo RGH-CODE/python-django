@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'django.contrib.admin',
+    'django.contrib.sessions',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django_filters',
@@ -91,7 +92,8 @@ DATABASES = {
         'NAME': 'storefront',
         'HOST':'localhost',
         'USER':'root',
-        'PASSWORD':'MYSQL12345'
+        'PASSWORD':'MYSQL12345',
+        'PORT':'3306'
     }
 }
 
