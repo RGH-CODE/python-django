@@ -2,7 +2,12 @@ from django.contrib import admin,messages
 from django.db.models import Count
 from django.urls import reverse
 from django.utils.html import format_html,urlencode
+from django.contrib.contenttypes.admin import GenericTabularInline
+
+from tag.models import TagItem
+
 from .import models
+
 
 
 #Additional Admin Filter 
@@ -23,6 +28,14 @@ class InventoryFilter(admin.SimpleListFilter):
     elif self.value()=='>100':
       return queryset.filter(inventory__gt=100)
     
+    
+#inline for Tag
+class TagedInline(GenericTabularInline):
+  autocomplete_fields=['tag']
+  model=TagItem
+  extra=0
+
+
 #customization +register
 #for product 
 @admin.register(models.Product)
@@ -34,6 +47,7 @@ class ProductAdmin(admin.ModelAdmin):
     autocomplete_fields=['collection']
     actions=['clear_inventory']
     list_display=['title','unit_price','inventory_status','collection_title']
+    inlines=[TagedInline]
     list_editable=['unit_price']
     list_per_page=10
     list_select_related=['collection']
