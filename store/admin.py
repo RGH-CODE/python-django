@@ -38,6 +38,7 @@ class ProductAdmin(admin.ModelAdmin):
     list_per_page=10
     list_select_related=['collection']
     list_filter=['collection','last_update',InventoryFilter]
+    search_fields=['title']
    #for collection title
     def collection_title(self,product):
         return product.collection.title
@@ -102,10 +103,22 @@ class CustomerAdmin(admin.ModelAdmin):
              'customer_id':customer.id
            }))
       return format_html('<a href={}>{}</a>',url,customer.orders_count)
+    
+    
+#for children inline orderitem for order 
+class OrderItemInline(admin.TabularInline): #we can use stackedinline instead of tabularinline 
+  autocomplete_fields=['product']
+  model=models.OrderItem
+  extra=0 #removing unfilled tables 
+  min_num=1
+  max_num=10
+  
+
 #for order 
 @admin.register(models.Order)
 class OrderAdmin(admin.ModelAdmin):
     autocomplete_fields=['customer']
+    inlines=[OrderItemInline]
     list_display=['id','customer','placed_at','payment_status']
     list_editable=['payment_status']
     
