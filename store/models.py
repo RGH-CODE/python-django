@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import MinValueValidator
 from uuid import uuid4
 from django.core.validators import MinValueValidator
 # Create your models here.
@@ -22,11 +23,13 @@ class Product(models.Model):
     title=models.CharField(max_length=250)
     slug=models.SlugField()
     description=models.TextField(null=True,blank=True)
-    unit_price=models.DecimalField(max_digits=6,decimal_places=2)
-    inventory=models.IntegerField()
+    unit_price=models.DecimalField(max_digits=6,
+                                   decimal_places=2,
+                                   validators=[MinValueValidator(1)])
+    inventory=models.IntegerField(validators=[MinValueValidator(0)])
     last_update=models.DateTimeField(auto_now=True)
     collection=models.ForeignKey(Collection,on_delete=models.PROTECT,related_name="products") #one to many relationship with collection  to product class 
-    promotions=models.ManyToManyField(Promotion)
+    promotions=models.ManyToManyField(Promotion,blank=True)
     
     
     def __str__(self)->str:
