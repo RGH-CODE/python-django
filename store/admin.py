@@ -4,9 +4,26 @@ from django.urls import reverse
 from django.utils.html import format_html,urlencode
 from .import models
 
+
+#Additional Admin Filter 
+class InventoryFilter(admin.SimpleListFilter):
+  title='inventory'
+  parameter_name='inventory'
+  
+  def lookups(self,request,model_admin):
+    return [('<10','Low'),
+            ('>10','Bet(11-50)'),
+            ('>100','High')]
+  
+  def queryset(self,request,queryset:QuerySet):
+    if self.value()=='<10':
+     return queryset.filter(inventory__lt=10)
+    if self.value()=='>10':
+      return queryset.filter(inventory__lt=50 , inventory__gt=10)
+    elif self.value()=='>100':
+      return queryset.filter(inventory__gt=100)
+    
 #customization +register
-
-
 #for product 
 @admin.register(models.Product)
 class ProductAdmin(admin.ModelAdmin):
@@ -14,7 +31,7 @@ class ProductAdmin(admin.ModelAdmin):
     list_editable=['unit_price']
     list_per_page=10
     list_select_related=['collection']
-    list_filter=['collection','last_update']
+    list_filter=['collection','last_update',InventoryFilter]
    #for collection title
     def collection_title(self,product):
         return product.collection.title
