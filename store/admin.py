@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.db.models import Count
 from .import models
 
 #customization +register
@@ -24,7 +25,20 @@ class ProductAdmin(admin.ModelAdmin):
       return 'Ok'
 
 #for collection
-admin.site.register(models.Collection)
+@admin.register(models.Collection)
+class CollectionAdmin(admin.ModelAdmin):
+  list_display=['title','products_count']
+  
+  @admin.display(ordering='products_count')
+  def products_count(self,collection):
+    return collection.products_count
+  
+  #overriding product count.cause product count is not in model.py
+  def get_queryset(self,request):
+    return super().get_queryset(request).annotate(products_count=Count('products'))
+  
+    
+  
 
 #for customer 
 @admin.register(models.Customer)
