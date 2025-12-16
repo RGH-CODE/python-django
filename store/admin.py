@@ -14,6 +14,7 @@ class ProductAdmin(admin.ModelAdmin):
     list_editable=['unit_price']
     list_per_page=10
     list_select_related=['collection']
+    list_filter=['collection','last_update']
    #for collection title
     def collection_title(self,product):
         return product.collection.title
