@@ -94,6 +94,7 @@ class CustomerAdmin(admin.ModelAdmin):
     list_editable=['membership']
     list_per_page=10
     search_fields=['first_name__istartswith',"last_name__istartswith"]
+    autocomplete_fields=['user']
     
     def get_queryset(self,request):
       return super().get_queryset(request).annotate(orders_count=Count('order'))
