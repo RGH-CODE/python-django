@@ -12,6 +12,8 @@ drf-nested-routers = "*"
 django-filter = "*"
 pymysql = "*"
 django-rest-framework-nested = "*"
+djoser = "*"
+djangorestframework-simplejwt = "*"
 
 [dev-packages]
 

@@ -83,6 +83,12 @@ class Order(models.Model):
     
     def __str__(self):
         return self.customer.first_name
+    
+    class Meta:
+        permissions=[
+            ('cancel_order','can cancel order')
+        ]
+    
 #one to one relationship with address to  customer  class 
 class Address(models.Model):
     street=models.CharField(max_length=255)
