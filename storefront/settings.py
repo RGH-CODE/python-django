@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-
+from datetime import timedelta
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -149,13 +149,17 @@ REST_FRAMEWORK={'COERCE_DECIMAL_TO_STRING':False,
                 }
 SIMPLE_JWT = {
    'AUTH_HEADER_TYPES': ('JWT',),
+   "ACCESS_TOKEN_LIFETIME": timedelta(days=5),
 }
 
 AUTH_USER_MODEL='core.User'
 
 
-DJOSER={
-    'SERIALIZERS':{
-        'user_create':'core.serializer.UserCreateSerializer'
+
+DJOSER = {
+    'SERIALIZERS': {
+        'user_create': 'core.serializer.UserCreateSerializer'
     }
+
 }
+
