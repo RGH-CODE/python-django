@@ -12,7 +12,7 @@ from rest_framework.viewsets import ModelViewSet,GenericViewSet
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter,OrderingFilter
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated,AllowAny
+from rest_framework.permissions import IsAuthenticated,AllowAny,IsAdminUser
 
 from rest_framework.mixins import CreateModelMixin,RetrieveModelMixin,DestroyModelMixin,UpdateModelMixin
 
@@ -60,6 +60,8 @@ class ProductViewSet(ModelViewSet):
 class CollectionViewSet(ModelViewSet):
    queryset=Collection.objects.annotate(products_count=Count('products')).all()
    serializer_class=CollectionSerializer
+  
+   permisson_class=[AdminOrReadOnly]
   
    def destroy(self ,request,*args,**kwargs):
       if OrderItem.objects.filter(product_id=kwargs['pk']).count()>0:
@@ -118,17 +120,17 @@ class CartItemViewSet(ModelViewSet):
   
   
 #for customer
-class CustomerViewSet(CreateModelMixin, UpdateModelMixin, RetrieveModelMixin, GenericViewSet):
+class CustomerViewSet(ModelViewSet):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
-    permission_classes=[IsAuthenticated]
+    permission_classes=[IsAdminUser]
     
     # def get_permissions(self):
     #   if self.request.method=='PUT':
     #     return[AllowAny()]
         
 
-    @action(detail=False,methods=["get","put"])
+    @action(detail=False,methods=["get","put"],permission_classes=[IsAuthenticated])
     def me(self,request):
       (customer,created)=Customer.objects.get_or_create(user_id=request.user.id)
       if request.method=="GET":
