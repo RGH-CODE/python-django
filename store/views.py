@@ -12,6 +12,7 @@ from rest_framework.viewsets import ModelViewSet,GenericViewSet
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter,OrderingFilter
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated,AllowAny
 
 from rest_framework.mixins import CreateModelMixin,RetrieveModelMixin,DestroyModelMixin,UpdateModelMixin
 
@@ -118,6 +119,12 @@ class CartItemViewSet(ModelViewSet):
 class CustomerViewSet(CreateModelMixin, UpdateModelMixin, RetrieveModelMixin, GenericViewSet):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
+    permission_classes=[IsAuthenticated]
+    
+    # def get_permissions(self):
+    #   if self.request.method=='PUT':
+    #     return[AllowAny()]
+        
 
     @action(detail=False,methods=["get","put"])
     def me(self,request):
