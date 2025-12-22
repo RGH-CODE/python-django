@@ -16,6 +16,8 @@ from rest_framework.permissions import IsAuthenticated,AllowAny
 
 from rest_framework.mixins import CreateModelMixin,RetrieveModelMixin,DestroyModelMixin,UpdateModelMixin
 
+from store.permissions import AdminOrReadOnly
+
 from . models import Product,Customer,Collection,OrderItem,Review,Cart,CartItem
 from . serializers import  ProductSerializer,CollectionSerializer,ReviewSerializer,CartSerializer,CartItemSerializer,AddCartItemSerializer,UpdateCartItemSerializer,CustomerSerializer
 from . filters import ProductFilter
@@ -30,7 +32,7 @@ class ProductViewSet(ModelViewSet):
   pagination_class=DefaultPagination
   search_fields=['title','description']
   ordering_fields=['unit_price','last_update']
-  
+  permission_classes=[AdminOrReadOnly]
   
   
   def get_serializer_context(self):
