@@ -19,7 +19,7 @@ from rest_framework.mixins import CreateModelMixin,RetrieveModelMixin,DestroyMod
 from store.permissions import AdminOrReadOnly, ViewCustomerHistoryPermission
 
 from . models import Product,Customer,Collection,OrderItem,Review,Cart,CartItem,Order
-from . serializers import  ProductSerializer,CollectionSerializer,ReviewSerializer,CartSerializer,CartItemSerializer,AddCartItemSerializer,UpdateCartItemSerializer,CustomerSerializer,OrderSerializer
+from . serializers import  ProductSerializer,CollectionSerializer,ReviewSerializer,CartSerializer,CartItemSerializer,AddCartItemSerializer,UpdateCartItemSerializer,CustomerSerializer,OrderSerializer,CreateOrderSerializer
 from . filters import ProductFilter
 from . pagination import DefaultPagination
 
@@ -145,13 +145,18 @@ class CustomerViewSet(ModelViewSet):
       
 
 class OrderViewSet(ModelViewSet):
-  
-  serializer_class=OrderSerializer
   permission_classes=[IsAuthenticated]
-
+  
+  def get_serializer_class(self):
+    if self.request.method=='POST':
+      return CreateOrderSerializer
+    return OrderSerializer
+ 
+  def get_serializer_context(self):
+    return {'user_id':self.request.user.id}
 
   def get_queryset(self):
     if self.request.user.is_staff:
       return Order.objects.all()
-    (customer_id,created)=Customer.objects.get_or_create(user_id=self.request.user.id)
+    (customer_id,created4)=Customer.objects.get_or_create(user_id=self.request.user.id)
     Order.objects.filter(customer_id=customer_id)
