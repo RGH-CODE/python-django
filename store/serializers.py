@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from decimal import Decimal
+from django.db import transaction
 from . models import Product,Customer,Collection,Review,Cart,CartItem,Order,OrderItem
 class CollectionSerializer(serializers.ModelSerializer):
     products_count=serializers.IntegerField(read_only=True)
@@ -132,10 +133,19 @@ class OrderSerializer(serializers.ModelSerializer):
         
 class CreateOrderSerializer(serializers.Serializer):
     cart_id=serializers.UUIDField()
-    
-    def save(self,**kwargs):
-        print(self.validated_data['cart_id'])
-        print(self.context['user_id'])
-        
-        (customer,created)=Customer.objects.get_or_create(user_id=self.context['user_id'])
-        Order.objects.create(customer=customer)
+    with transaction.atomic():
+      def save(self,**kwargs):
+          (customer,created)=Customer.objects.get_or_create(user_id=self.context['user_id'])
+          order=Order.objects.create(customer=customer)
+          
+          cart_items=CartItem.objects.filter(cart_id=self.validated_data['cart_id'])
+          
+          order_items=[OrderItem(      #item for item in cart_items
+              order=order,
+              product=item.product,
+              unit_price=item.product.unit_price,
+              quantity=item.quantity
+              ) for item in cart_items]
+          OrderItem.objects.bulk_create(order_items)
+          
+          Cart.objects.filter(pk=self.validated_data['cart_id']).delete()
