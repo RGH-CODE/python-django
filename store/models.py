@@ -68,6 +68,12 @@ class Customer(models.Model):
     def last_name(self):
         return self.user.last_name
     
+    class Meta:
+        permissions=[
+            ('view_history','can view history')
+        ]
+    
+    
 class Order(models.Model):
     PAYMENT_STATUS_PENDING='P'
     PAYMENT_STATUS_COMPLETE='C'
@@ -96,7 +102,7 @@ class Address(models.Model):
     customer=models.OneToOneField(Customer,on_delete=models.CASCADE,primary_key=True) #one to ONE relationship with customer  to address class 
     
 class OrderItem(models.Model):
-    order=models.ForeignKey(Order,on_delete=models.PROTECT) #one to many relationship with Order  to OrderItem class 
+    order=models.ForeignKey(Order,on_delete=models.PROTECT,related_name='items') #one to many relationship with Order  to OrderItem class 
     product=models.ForeignKey(Product,on_delete=models.PROTECT,related_name='orderitems')  #one to many relationship with cart  to OrderItem class 
     quantity=models.PositiveSmallIntegerField()
     unit_price=models.DecimalField(max_digits=6,decimal_places=2)

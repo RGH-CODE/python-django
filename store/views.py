@@ -16,10 +16,10 @@ from rest_framework.permissions import IsAuthenticated,AllowAny,IsAdminUser
 
 from rest_framework.mixins import CreateModelMixin,RetrieveModelMixin,DestroyModelMixin,UpdateModelMixin
 
-from store.permissions import AdminOrReadOnly
+from store.permissions import AdminOrReadOnly, ViewCustomerHistoryPermission
 
-from . models import Product,Customer,Collection,OrderItem,Review,Cart,CartItem
-from . serializers import  ProductSerializer,CollectionSerializer,ReviewSerializer,CartSerializer,CartItemSerializer,AddCartItemSerializer,UpdateCartItemSerializer,CustomerSerializer
+from . models import Product,Customer,Collection,OrderItem,Review,Cart,CartItem,Order
+from . serializers import  ProductSerializer,CollectionSerializer,ReviewSerializer,CartSerializer,CartItemSerializer,AddCartItemSerializer,UpdateCartItemSerializer,CustomerSerializer,OrderSerializer
 from . filters import ProductFilter
 from . pagination import DefaultPagination
 
@@ -125,10 +125,10 @@ class CustomerViewSet(ModelViewSet):
     serializer_class = CustomerSerializer
     permission_classes=[IsAdminUser]
     
-    # def get_permissions(self):
-    #   if self.request.method=='PUT':
-    #     return[AllowAny()]
-        
+    @action(detail=True,permission_classes=[ViewCustomerHistoryPermission])
+    def history(self,request,pk):
+      return Response("you have permission to view")
+    
 
     @action(detail=False,methods=["get","put"],permission_classes=[IsAuthenticated])
     def me(self,request):
@@ -143,4 +143,7 @@ class CustomerViewSet(ModelViewSet):
         serializer.save()
         return Response(serializer.data)
       
-  
+
+class OrderViewSet(ModelViewSet):
+  queryset=Order.objects.all()
+  serializer_class=OrderSerializer
