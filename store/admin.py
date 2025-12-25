@@ -25,7 +25,10 @@ class InventoryFilter(admin.SimpleListFilter):
     elif self.value()=='>100':
       return queryset.filter(inventory__gt=100)
     
-    
+
+
+class ProductImageInline(admin.TabularInline):
+  model=models.ProductImage
 
 #customization +register
 #for product 
@@ -38,7 +41,7 @@ class ProductAdmin(admin.ModelAdmin):
     autocomplete_fields=['collection']
     actions=['clear_inventory']
     list_display=['title','unit_price','inventory_status','collection_title']
-    
+    inlines=[ProductImageInline]
     list_editable=['unit_price']
     list_per_page=10
     list_select_related=['collection']
