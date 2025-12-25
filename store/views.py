@@ -18,8 +18,8 @@ from rest_framework.mixins import CreateModelMixin,RetrieveModelMixin,DestroyMod
 
 from store.permissions import AdminOrReadOnly, ViewCustomerHistoryPermission
 
-from . models import Product,Customer,Collection,OrderItem,Review,Cart,CartItem,Order
-from . serializers import  ProductSerializer,CollectionSerializer,ReviewSerializer,CartSerializer,CartItemSerializer,AddCartItemSerializer,UpdateCartItemSerializer,CustomerSerializer,OrderSerializer,CreateOrderSerializer,UpdateOrderSerializer
+from . models import Product,Customer,Collection,OrderItem, ProductImage,Review,Cart,CartItem,Order
+from . serializers import  ProductImageSerializer, ProductSerializer,CollectionSerializer,ReviewSerializer,CartSerializer,CartItemSerializer,AddCartItemSerializer,UpdateCartItemSerializer,CustomerSerializer,OrderSerializer,CreateOrderSerializer,UpdateOrderSerializer
 from . filters import ProductFilter
 from . pagination import DefaultPagination
 
@@ -175,3 +175,12 @@ class OrderViewSet(ModelViewSet):
       return Order.objects.all()
     customer_id=Customer.objects.get(user_id=self.request.user.id)
     Order.objects.filter(customer_id=customer_id)
+    
+class ProductImageViewSet(ModelViewSet):
+  serializer_class=ProductImageSerializer
+  
+  def get_queryset(self):
+    return ProductImage.objects.filter(product_id=self.kwargs['product_pk'])
+  
+  def get_serializer_context(self):
+    return {'product_id':self.kwargs['product_pk']}
