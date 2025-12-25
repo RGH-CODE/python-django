@@ -27,8 +27,20 @@ class InventoryFilter(admin.SimpleListFilter):
     
 
 
-class ProductImageInline(admin.TabularInline):
+class ProductImageInline(admin.TabularInline): 
   model=models.ProductImage
+  fields = ['image','thumbnail']      # ← THIS is the missing piece
+  readonly_fields = ['thumbnail']
+  
+  def thumbnail(self, instance):
+    if instance.pk and instance.image:
+        return format_html(
+            "<img src='{}' class='thumbnail' />",
+            instance.image.url
+        )
+    return " "
+
+  thumbnail.short_description = "Preview"
 
 #customization +register
 #for product 
@@ -69,6 +81,11 @@ class ProductAdmin(admin.ModelAdmin):
         f'{updated_count} Products were updated successfully',
         messages.ERROR 
       )
+      
+    class Media:
+      css={
+        'all':['styles.css']
+      }
     
     
 #for collection
