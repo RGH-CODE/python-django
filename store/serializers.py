@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from decimal import Decimal
 from django.db import transaction
+
 from . models import Product,Customer,Collection, ProductImage,Review,Cart,CartItem,Order,OrderItem
 class CollectionSerializer(serializers.ModelSerializer):
     products_count=serializers.IntegerField(read_only=True)
@@ -9,12 +10,22 @@ class CollectionSerializer(serializers.ModelSerializer):
         fields=['id','title','products_count']
        
         
-       
+class ProductImageSerializer(serializers.ModelSerializer):
+    
+    def create(self,validated_data):
+        product_id=self.context['product_id']
+        return ProductImage.objects.create(product_id=product_id,**validated_data)
+    
+    class Meta:
+        model=ProductImage
+        fields=['id','image']
+           
     
 class ProductSerializer(serializers.ModelSerializer):
+    images=ProductImageSerializer(many=True,read_only=True)
     class Meta:
         model=Product
-        fields=['id','title','description','slug','inventory','price','price_with_tax','collection','collection_url']
+        fields=['id','title','description','slug','inventory','price','price_with_tax','collection','collection_url','images']
     #since id and title are same name in product model they can be removed from here 
     price=serializers.DecimalField(max_digits=6,decimal_places=2,source='unit_price') #price name is not in product model so need to define here  
    
@@ -167,14 +178,4 @@ class UpdateOrderSerializer(serializers.ModelSerializer):
         model=Order
         fields=['payment_status']
         
-        
-class ProductImageSerializer(serializers.ModelSerializer):
-    
-    def create(self,validated_data):
-        product_id=self.context['product_id']
-        return ProductImage.objects.create(product_id=product_id,**validated_data)
-    
-    class Meta:
-        model=ProductImage
-        fields=['id','image']
         
