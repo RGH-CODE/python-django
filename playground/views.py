@@ -1,11 +1,11 @@
 from django.shortcuts import render 
-from django.core.mail import send_mail,mail_admins,BadHeadError
+from django.core.mail import send_mail,mail_admins,BadHeaderError
 
 def htmlRender(request):
     try:
-     send_mail('subject','message','from@rajesh.com',['rajesh@gmail.com'])
+     mail_admins('subject','message',html_message='this is admin mail')
     
-    except BadHeadError:
+    except BadHeaderError:
         pass
     
     return render(request,'hello.html',{'name':'Rajesh'})
