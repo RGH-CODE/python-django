@@ -1,9 +1,11 @@
 from django.shortcuts import render 
-from django.core.mail import send_mail,mail_admins,BadHeaderError
+from django.core.mail import send_mail,mail_admins,BadHeaderError,EmailMessage
 
 def htmlRender(request):
     try:
-     mail_admins('subject','message',html_message='this is admin mail')
+     message=EmailMessage('subject','message','from@rajesh.com',['rajesh@gmail.com'])
+     message.attach_file('playground/static/images/abc.jpg')
+     message.send()
     
     except BadHeaderError:
         pass
