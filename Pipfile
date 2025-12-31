@@ -18,6 +18,7 @@ pillow = "*"
 django-templated-mail = "*"
 redis = "*"
 celery = "*"
+flower = "*"
 
 [dev-packages]
 
