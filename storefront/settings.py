@@ -182,3 +182,13 @@ ADMINS=[
 ]
 
 CELERY_BROKER_URL='redis://localhost:6379/1'
+
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+    'notify-daily': {
+        'task': 'playground.tasks.notify_customer',
+        'schedule': timedelta(seconds=5), # every day at 9:00 AM
+        'args': ('Hello',),
+    },
+}
