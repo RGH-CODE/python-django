@@ -180,3 +180,5 @@ DEFAULT_FROM_EMAIL='from@rajesh.com'
 ADMINS=[
     ('Rajesh','rajesh@gmail.com')
 ]
+
+CELERY_BROKER_URL='redis://localhost:6379/1'
