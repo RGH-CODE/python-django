@@ -1,11 +1,10 @@
 from django.shortcuts import render 
 import requests
-from django.core.cache import cache 
+from django.views.decorators.cache import cache_page
+
+@cache_page(5*60)
 def htmlRender(request):
-    key='httpbin_result'
-    if cache.get(key) is None:
-       response=requests.get('https://httpbin.org/delay/2')
-       data=response.json()
-       cache.set(key,data)
-    return render(request,'hello.html',{'name':cache.get(key)})
+    response=requests.get('https://httpbin.org/delay/2')
+    data=response.json()  
+    return render(request,'hello.html',{'name':data})
     
