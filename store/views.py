@@ -61,8 +61,12 @@ class CollectionViewSet(ModelViewSet):
    queryset=Collection.objects.annotate(products_count=Count('products')).all()
    serializer_class=CollectionSerializer
   
-   permission_classes = [IsAuthenticated]
-
+   def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [AllowAny()]
+        return [IsAdminUser()]
+      
+      
    def destroy(self ,request,*args,**kwargs):
       if OrderItem.objects.filter(product_id=kwargs['pk']).count()>0:
         return Response({'error':'This collection can not be deleted cause it is related with order item'},status=status.HTTP_405_METHOD_NOT_ALLOWED)
