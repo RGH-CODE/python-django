@@ -19,7 +19,7 @@ class WebUser(HttpUser):
     def add_to_cart(self):
         product_id=randint(1,10)
         self.client.post(f'/store/carts/{self.cart_id}/items/',
-        name=f'/store/carts/{self.cart_id}/items/',
+        name=f'/store/carts/:id/items/',
         json={'product_id':product_id,'quantity':1} #for saving to database 
         )
         
