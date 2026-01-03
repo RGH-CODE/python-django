@@ -1,6 +1,7 @@
 /static/
 /media/
 .env
+general.log
 
 
 # Ignore virtual environment

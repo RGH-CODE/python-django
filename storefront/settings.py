@@ -97,18 +97,19 @@ WSGI_APPLICATION = 'storefront.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / '.env')
+
 DATABASES = {
-   'default': {
+    'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ.get('DB_NAME'),
-        'USER': os.environ.get('DB_USER'),
-        'PASSWORD': os.environ.get('DB_PASSWORD'),
-        'HOST': os.environ.get('DB_HOST'),
+        'NAME': os.environ.get('DB_NAME', 'storefront'),
+        'USER': os.environ.get('DB_USER', 'root'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', ''),
+        'HOST': os.environ.get('DB_HOST', 'localhost'),  # default added
         'PORT': os.environ.get('DB_PORT', '3306'),
     }
-    }
-
-
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -217,4 +218,30 @@ CACHES = {
     }
 }
 
-co
+
+LOGGING={
+    'version':1,
+    'disable_existing_loggers':False,
+    'handlers':{
+        "console":{
+            'class':'logging.StreamHandler',
+        },
+        'file':{
+            'class':'logging.FileHandler',
+            'filename':'general.log',
+            'formatter':'verbose'
+        }
+    },
+    'loggers':{
+        '':{
+            'handlers':['console','file'],
+            'level':os.environ.get('DJANGO_LOG_LEVEL','INFO')
+        }
+    },
+    'formatters':{
+        'verbose':{
+            'format':'{asctime}({levelname})-{name}-{message}',
+            'style':'{'
+        }
+    }
+}
