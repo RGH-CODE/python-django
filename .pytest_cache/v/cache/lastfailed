@@ -1,0 +1,4 @@
+{
+  "store/tests/test_collections.py::TestCreateCollection::test_if_data_is_invalid_returns_400": true,
+  "store/tests/test_collections.py::TestCreateCollection::test_if_data_is_valid_returns_201": true
+}

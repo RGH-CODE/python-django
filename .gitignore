@@ -1,2 +1,13 @@
 /static/
 /media/
+.env
+
+
+# Ignore virtual environment
+venv_new/
+venv/
+
+
+# Python cache
+__pycache__/
+*.pyc
