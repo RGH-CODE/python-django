@@ -150,10 +150,10 @@ class CustomerViewSet(ModelViewSet):
 
 class OrderViewSet(ModelViewSet):
   http_method_names=['get','patch','delete','head','options']
-  def get_permissons(self):
+  def get_permissions(self):
     if self.request.method in ['PATCH','DELETE']:
       return[IsAdminUser()]
-    return[IsAuthenticated]
+    return[IsAuthenticated()]
     
     
     
@@ -178,7 +178,7 @@ class OrderViewSet(ModelViewSet):
     if self.request.user.is_staff:
       return Order.objects.all()
     customer_id=Customer.objects.get(user_id=self.request.user.id)
-    Order.objects.filter(customer_id=customer_id)
+    return Order.objects.filter(customer_id=customer_id)
     
 class ProductImageViewSet(ModelViewSet):
   serializer_class=ProductImageSerializer
