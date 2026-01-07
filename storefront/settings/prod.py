@@ -14,3 +14,8 @@ DATABASES = {
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
 DEBUG = os.environ.get("DEBUG", "False") == "True"
+
+ALLOWED_HOSTS = [
+    "nepecom.onrender.com",  # your Render URL
+    "www.nepecom.onrender.com",  # optional, if you use www
+]
