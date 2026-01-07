@@ -17,5 +17,7 @@ DEBUG = os.environ.get("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = [
     "nepecom.onrender.com",  # your Render URL
-    "www.nepecom.onrender.com",  # optional, if you use www
+    "www.nepecom.onrender.com",
+    'localhost',
+    '127.0.0.1',
 ]
