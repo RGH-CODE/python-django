@@ -2,7 +2,7 @@ from django.contrib import admin,messages
 from django.db.models import Count
 from django.urls import reverse
 from django.utils.html import format_html,urlencode
-
+from django.db.models import QuerySet
 from .import models
 
 
