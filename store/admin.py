@@ -110,14 +110,14 @@ class CollectionAdmin(admin.ModelAdmin):
 #for customer 
 @admin.register(models.Customer)
 class CustomerAdmin(admin.ModelAdmin):
-    list_display=['first_name','last_name','membership','orders_count']
+    list_display = ['user_first_name', 'user_last_name', 'membership', 'orders_count']
     list_editable=['membership']
     list_per_page=10
-    search_fields=['first_name__istartswith',"last_name__istartswith"]
+    search_fields = ['user__first_name__istartswith', 'user__last_name__istartswith']
     autocomplete_fields=['user']
     
     def get_queryset(self,request):
-      return super().get_queryset(request).annotate(orders_count=Count('order'))
+      return super().get_queryset(request).annotate(orders_count=Count('orders'))
     
     @admin.display(ordering='orders_count',description="Orders")
     def orders_count(self,customer):
@@ -129,6 +129,11 @@ class CustomerAdmin(admin.ModelAdmin):
              'customer_id':customer.id
            }))
       return format_html('<a href={}>{}</a>',url,customer.orders_count)
+    def user_first_name(self, customer):
+        return customer.user.first_name
+
+    def user_last_name(self, customer):
+        return customer.user.last_name
     
     
 #for children inline orderitem for order 
