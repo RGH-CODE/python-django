@@ -1,25 +1,16 @@
 import os
-from .common import *
+from pathlib import Path
+from dotenv import load_dotenv
 import dj_database_url
+from .common import *
 
-DEBUG = False
 
-# Secret key from Render environment
-SECRET_KEY = os.environ.get("SECRET_KEY")
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+load_dotenv(os.path.join(BASE_DIR, ".env"))
 
-# Allow all hosts for Render
-ALLOWED_HOSTS = ["*"]
-
-# Database from Render's DATABASE_URL
 DATABASES = {
-    "default": dj_database_url.config(
-        default=os.environ.get("DATABASE_URL"),
-        conn_max_age=600,
-    )
+    "default": dj_database_url.parse(os.environ.get("DATABASE_URL"), conn_max_age=600)
 }
 
-# Static files settings for Render
-
-
-# Optional: whitenoise for serving static files
-MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
+SECRET_KEY = os.environ.get("SECRET_KEY")
+DEBUG = os.environ.get("DEBUG", "False") == "True"
