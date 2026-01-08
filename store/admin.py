@@ -117,7 +117,7 @@ class CustomerAdmin(admin.ModelAdmin):
     autocomplete_fields=['user']
     
     def get_queryset(self,request):
-      return super().get_queryset(request).annotate(orders_count=Count('orders'))
+      return super().get_queryset(request).annotate(orders_count=Count('order'))
     
     @admin.display(ordering='orders_count',description="Orders")
     def orders_count(self,customer):

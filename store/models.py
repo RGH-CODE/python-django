@@ -49,7 +49,7 @@ class Product(models.Model):
         
 class ProductImage(models.Model):
     product=models.ForeignKey(Product,on_delete=models.CASCADE,related_name='images')
-    image=models.ImageField(upload_to='store/images',validators=[validate_file_size])    
+    image=models.ImageField(upload_to='store/images')    
             
     
 class Customer(models.Model):
@@ -62,7 +62,9 @@ class Customer(models.Model):
         (MEMBERSHIP_SILVER,'Silver'),
         (MEMBERSHIP_GOLD,'Gold'),
     ]
-    
+    first_name = models.CharField(max_length=255, null=True, blank=True)
+    last_name = models.CharField(max_length=255, null=True, blank=True)
+    email = models.EmailField(null=True, blank=True)
     phone=models.CharField(max_length=255,unique=True)
     birth_date = models.DateField(blank=True,null=True)
     membership=models.CharField(max_length=1,choices=MEMBERSHIP_CHOICES,default=MEMBERSHIP_BRONZE)
@@ -78,12 +80,12 @@ class Customer(models.Model):
             ('view_history','can view history')
         ]
         ordering=['user__first_name','user__last_name']
-    @admin.display(ordering='user__first_name')   
-    def first_name(self):
-        return self.user.first_name if self.user else ''
-    @admin.display(ordering='user__last_name')   
-    def last_name(self):
-        return self.user.last_name if self.user else ''
+    # @admin.display(ordering='user__first_name')   
+    # def first_name(self):
+    #     return self.user.first_name if self.user else ''
+    # @admin.display(ordering='user__last_name')   
+    # def last_name(self):
+    #     return self.user.last_name if self.user else ''
     
     
         
