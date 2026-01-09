@@ -148,8 +148,12 @@ class OrderItemInline(admin.TabularInline): #we can use stackedinline instead of
 #for order 
 @admin.register(models.Order)
 class OrderAdmin(admin.ModelAdmin):
+   
     autocomplete_fields=['customer']
     inlines=[OrderItemInline]
     list_display=['id','customer','placed_at','payment_status']
     list_editable=['payment_status']
-    
+  
+@admin.register(models.Cart)
+class CartAdmin(admin.ModelAdmin):
+  list_display=['id','created_at']
