@@ -53,7 +53,7 @@ INSTALLED_APPS = [
     'tag',
     'likes',
     'core',
-    'cloudinary_storage'
+    'cloudinary_storage',
     "corsheaders"
 ]
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
