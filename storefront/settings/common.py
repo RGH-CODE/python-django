@@ -53,17 +53,11 @@ INSTALLED_APPS = [
     'tag',
     'likes',
     'core',
+    'cloudinary_storage'
     "corsheaders"
 ]
 
-INSTALLED_APPS += ['cloudinary', 'cloudinary_storage']
 
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.environ.get("CLOUDINARYNAME"),
-    'API_KEY': os.environ.get("CLOUDINARYAPIKEY"),
-    'API_SECRET': os.environ.get("CLOUDINARYSECRETKEY")
-}
 
 
 MIDDLEWARE = [
