@@ -31,7 +31,7 @@ load_dotenv(BASE_DIR / '.env')
 # SECURITY WARNING: don't run with debug turned on in production!
 
 
-DEBUG=True
+DEBUG=False 
 
 
 # Application definition
@@ -52,10 +52,22 @@ INSTALLED_APPS = [
     'store',
     'tag',
     'likes',
-    'core'
+    'core',
+    "corsheaders"
 ]
 
+INSTALLED_APPS += ['cloudinary', 'cloudinary_storage']
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get("CLOUDINARYNAME"),
+    'API_KEY': os.environ.get("CLOUDINARYAPIKEY"),
+    'API_SECRET': os.environ.get("CLOUDINARYSECRETKEY")
+}
+
+
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -238,3 +250,10 @@ LOGGING={
         }
     }
 }
+ALLOWED_HOSTS = [
+    "nepecom.onrender.com",  # your Render URL
+    "www.nepecom.onrender.com",
+    "http://localhost:5173",
+    'localhost',
+    '127.0.0.1',
+]

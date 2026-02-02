@@ -18,6 +18,17 @@ DEBUG = os.environ.get("DEBUG", "False") == "True"
 ALLOWED_HOSTS = [
     "nepecom.onrender.com",  # your Render URL
     "www.nepecom.onrender.com",
+    "http://localhost:5173",
     'localhost',
     '127.0.0.1',
 ]
+CORS_ALLOW_ALL_ORIGINS = True
+
+INSTALLED_APPS += ['cloudinary', 'cloudinary_storage']
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get("CLOUDINARYNAME"),
+    'API_KEY': os.environ.get("CLOUDINARYAPIKEY"),
+    'API_SECRET': os.environ.get("CLOUDINARYSECRETKEY")
+}
