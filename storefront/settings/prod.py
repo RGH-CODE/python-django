@@ -24,7 +24,7 @@ ALLOWED_HOSTS = [
 ]
 CORS_ALLOW_ALL_ORIGINS = True
 
-INSTALLED_APPS += ['cloudinary_storage']
+INSTALLED_APPS += ['cloudinary_storage','cloudinary']
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 CLOUDINARY_STORAGE = {
