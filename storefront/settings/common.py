@@ -19,6 +19,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / '.env')
 
 
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get("CLOUDINARYNAME"),
+    'API_KEY': os.environ.get("CLOUDINARYAPIKEY"),
+    'API_SECRET': os.environ.get("CLOUDINARYSECRETKEY"),
+}
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 
@@ -53,8 +62,9 @@ INSTALLED_APPS = [
     'tag',
     'likes',
     'core',
-   
-    "corsheaders"
+    "corsheaders",
+    'cloudinary',
+    'cloudinary_storage',
 ]
 
 
@@ -251,3 +261,15 @@ ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
 ]
+
+
+
+
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get("CLOUDINARYNAME"),
+    'API_KEY': os.environ.get("CLOUDINARYAPIKEY"),
+    'API_SECRET': os.environ.get("CLOUDINARYSECRETKEY"),
+}

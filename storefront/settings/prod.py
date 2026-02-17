@@ -24,11 +24,3 @@ ALLOWED_HOSTS = [
 ]
 CORS_ALLOW_ALL_ORIGINS = True
 
-INSTALLED_APPS += ['cloudinary_storage','cloudinary']
-
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.environ.get("CLOUDINARYNAME"),
-    'API_KEY': os.environ.get("CLOUDINARYAPIKEY"),
-    'API_SECRET': os.environ.get("CLOUDINARYSECRETKEY")
-}
