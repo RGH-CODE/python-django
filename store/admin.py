@@ -61,7 +61,7 @@ class ProductAdmin(admin.ModelAdmin):
     search_fields=['title']
    #for collection title
     def collection_title(self,product):
-        return product.collection.title
+        return product.collection.title if product.collection else ''
        
    
     #for inventory status

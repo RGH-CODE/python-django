@@ -64,7 +64,7 @@ class Customer(models.Model):
     first_name = models.CharField(max_length=255, null=True, blank=True)
     last_name = models.CharField(max_length=255, null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
-    phone=models.CharField(max_length=255,unique=True)
+    phone=models.CharField(max_length=255, null=True, blank=True)
     birth_date = models.DateField(blank=True,null=True)
     membership=models.CharField(max_length=1,choices=MEMBERSHIP_CHOICES,default=MEMBERSHIP_BRONZE)
     user=models.OneToOneField(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)

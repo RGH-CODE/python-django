@@ -15,7 +15,7 @@ from datetime import timedelta
 import os
 from dotenv import load_dotenv
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 load_dotenv(BASE_DIR / '.env')
 
 
@@ -26,6 +26,14 @@ CLOUDINARY_STORAGE = {
     'API_KEY': os.environ.get("CLOUDINARYAPIKEY"),
     'API_SECRET': os.environ.get("CLOUDINARYSECRETKEY"),
 }
+
+import cloudinary
+cloudinary.config(
+  cloud_name = os.environ.get("CLOUDINARYNAME"),
+  api_key = os.environ.get("CLOUDINARYAPIKEY"),
+  api_secret = os.environ.get("CLOUDINARYSECRETKEY"),
+  secure = True
+)
 
 
 
@@ -115,9 +123,6 @@ WSGI_APPLICATION = 'storefront.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-load_dotenv(BASE_DIR / '.env')
 
 
 # Password validation
