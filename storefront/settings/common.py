@@ -262,6 +262,7 @@ LOGGING={
 ALLOWED_HOSTS = [
     "nepecom.onrender.com",  # your Render URL
     "www.nepecom.onrender.com",
+    "nepecom.rajesh-ghimire200.workers.dev"
     "http://localhost:5173",
     'localhost',
     '127.0.0.1',
