@@ -104,8 +104,9 @@ class Order(models.Model):
     customer=models.ForeignKey(Customer,on_delete=models.PROTECT)
     
     def __str__(self):
-        return self.customer.first_name
-    
+        if self.customer and self.customer.first_name:
+             return f"Order #{self.id} - {self.customer.first_name}"
+        return f"#Order #{self.id}"
     class Meta:
         permissions=[
             ('cancel_order','can cancel order')

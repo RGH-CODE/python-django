@@ -59,9 +59,18 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 #for simple product detail
 class SimpleProductSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
     class Meta:
         model=Product
-        fields=['id','title','unit_price']
+        fields=['id','image','title','unit_price']
+    
+    def get_image(self,product):
+        image=product.images.first()
+        if image:
+            return image.image.url
+        return None
+        
+        
 
        
 class CartItemSerializer(serializers.ModelSerializer):
@@ -137,10 +146,12 @@ class CustomerSerializer(serializers.ModelSerializer):
       
 
 class OrderItemSerializer(serializers.ModelSerializer):
+    product=SimpleProductSerializer(read_only=True)
     class Meta:
         model=OrderItem
         fields=['id','product','unit_price','quantity']  
-      
+    
+    
 class OrderSerializer(serializers.ModelSerializer):
     items=OrderItemSerializer(many=True,read_only=True)
     class Meta:
