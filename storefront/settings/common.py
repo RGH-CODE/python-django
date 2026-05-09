@@ -188,6 +188,10 @@ AUTH_USER_MODEL='core.User'
 
 
 DJOSER = {
+    'LOGIN_FIELD':'email',
+    'USER_CREATE_PASSWORD_RETYPE':True,
+    'SEND_ACTIVATION_EMAIL':True,
+    'ACTIVATION_URL':'activate/{uid}/{token}',
     'SERIALIZERS': {
         'user_create': 'core.serializers.UserCreateSerializer',
         'current_user': 'core.serializers.UserSerializer'
@@ -262,7 +266,7 @@ LOGGING={
 ALLOWED_HOSTS = [
     "nepecom.onrender.com",  # your Render URL
     "www.nepecom.onrender.com",
-    "nepecom.rajesh-ghimire200.workers.dev"
+    "nepecom.rajesh-ghimire200.workers.dev",
     "http://localhost:5173",
     'localhost',
     '127.0.0.1',
