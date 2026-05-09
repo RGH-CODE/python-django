@@ -189,7 +189,7 @@ AUTH_USER_MODEL='core.User'
 
 DJOSER = {
     'LOGIN_FIELD':'email',
-    'USER_CREATE_PASSWORD_RETYPE':True,
+    'USER_CREATE_PASSWORD_RETYPE':False,
     'SEND_ACTIVATION_EMAIL':True,
     'ACTIVATION_URL':'activate/{uid}/{token}',
     'SERIALIZERS': {
@@ -200,12 +200,14 @@ DJOSER = {
 }
 
 #FOR SMTP
+#email host 
 EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST='localhost'
-EMAIL_HOST_USER=''
-EMAIL_HOST_PASSWORD=''
-EMAIL_PORT=2525
-DEFAULT_FROM_EMAIL='from@rajesh.com'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 #for admin site mail
 ADMINS=[
@@ -273,7 +275,7 @@ ALLOWED_HOSTS = [
 ]
 
 
-
+CORS_ALLOW_ALL_ORIGINS = True
 
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
