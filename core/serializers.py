@@ -13,8 +13,8 @@ class UserCreateSerializer(BaseUserCreateSerializer):
         fields = [
             'id',
             'username',
-            'password',
             'email',
+            'password',
             'first_name',
             'last_name'
         ]
