@@ -202,22 +202,25 @@ DJOSER = {
 
 }
 # Email / Site settings
-DOMAIN = "localhost:5173"
-SITE_NAME = "Nepecom"
+DOMAIN = os.getenv('DOMAIN', 'localhost:5173')
+SITE_NAME = os.getenv('SITE_NAME', 'Nepecom')
+
 
 #FOR SMTP
 #email host 
 EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = os.getenv("EMAIL_HOST")
-EMAIL_PORT = os.getenv("EMAIL_PORT")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT",587))
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS") == "True"
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
 
+
+
 #for admin site mail
 ADMINS=[
-    ('Rajesh','rajesh@gmail.com')
+    ('Rajesh Ghimire','rajesh.ghimire200@gmail.com')
 ]
 
 CELERY_BROKER_URL='redis://localhost:6379/1'
