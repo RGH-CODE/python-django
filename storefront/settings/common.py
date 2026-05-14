@@ -48,7 +48,8 @@ cloudinary.config(
 # SECURITY WARNING: don't run with debug turned on in production!
 
 
-DEBUG=False 
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 
 # Application definition
@@ -202,7 +203,7 @@ DJOSER = {
 
 }
 # Email / Site settings
-DOMAIN = os.getenv('DOMAIN', 'localhost:5173')
+DOMAIN = os.getenv('DOMAIN', 'localhost:3000').replace('https://', '').replace('http://', '')
 SITE_NAME = os.getenv('SITE_NAME', 'Nepecom')
 
 
@@ -279,14 +280,14 @@ LOGGING={
 ALLOWED_HOSTS = [
     "nepecom.onrender.com",  # your Render URL
     "www.nepecom.onrender.com",
-    "nepecom.rajesh-ghimire200.workers.dev",
-    "http://localhost:5173",
-    'localhost',
-    '127.0.0.1',
+    "nepecom.nepecom.workers.dev",
+   
 ]
 
 
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = [
+    'https://nepecom.nepecom.workers.dev',
+]
 
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
