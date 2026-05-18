@@ -18,7 +18,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path,include
-
+from core.views import GoogleLoginView
 
 admin.site.site_header='Storefront Admin'
 admin.site.index_title="Admin"
@@ -32,6 +32,9 @@ urlpatterns = [
     path('auth/', include('djoser.urls.jwt')),
     path('store/',include('store.urls'))
 
+]
+urlpatterns+=[
+    path("auth/google/",GoogleLoginView.as_view())
 ]
 if settings.DEBUG:
    

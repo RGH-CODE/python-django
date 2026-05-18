@@ -219,6 +219,10 @@ FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:5173')
 
 EMAIL_TIMEOUT = 30
 
+
+#google oauth
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+
 #for admin site mail
 ADMINS=[
     ('Rajesh Ghimire','rajesh.ghimire200@gmail.com')
