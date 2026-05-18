@@ -96,3 +96,5 @@ whitenoise==6.11.0
 wsproto==1.3.2
 zope.event==6.1
 zope.interface==8.1.1
+google-auth==2.x.x
+google-auth-oauthlib==1.x.x
