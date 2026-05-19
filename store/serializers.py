@@ -2,7 +2,7 @@ from rest_framework import serializers
 from decimal import Decimal
 from django.db import transaction
 
-from . models import Product,Customer,Collection, ProductImage,Review,Cart,CartItem,Order,OrderItem
+from . models import Product,Customer,Collection, ProductImage,Review,Cart,CartItem,Order,OrderItem,Address
 class CollectionSerializer(serializers.ModelSerializer):
     products_count=serializers.IntegerField(read_only=True)
     class Meta:
@@ -170,7 +170,19 @@ class CreateOrderSerializer(serializers.Serializer):
             raise serializers.ValidationError('Cart is Empty!!!!!')
         return cart_id
             
-    
+    def validate(self,attrs):
+        customer=Customer.objects.get(user_id=self.context["user_id"])
+        
+        if not customer.phone:
+            raise serializers.ValidationError({
+                "phone":"please add phone number before placing order"
+            })
+            
+        if not Address.objects.filter(customer=customer).exists():
+            raise serializers.ValidationError({
+               "address":"please add delivery address before placing order" 
+            })
+        return attrs
     
     def save(self,**kwargs):
        with transaction.atomic():
@@ -196,4 +208,9 @@ class UpdateOrderSerializer(serializers.ModelSerializer):
         model=Order
         fields=['payment_status']
         
+        
+class AddressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Address
+        fields=['street','city','province','postal_code']
         

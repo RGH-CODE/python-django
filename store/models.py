@@ -116,7 +116,11 @@ class Order(models.Model):
 class Address(models.Model):
     street=models.CharField(max_length=255)
     city=models.CharField(max_length=255)
+    province = models.CharField(max_length=255)
+    postal_code = models.CharField(max_length=20,null=True,blank=True)
     customer=models.OneToOneField(Customer,on_delete=models.CASCADE,primary_key=True) #one to ONE relationship with customer  to address class 
+    def __str__(self):
+        return f"{self.street}, {self.city}"
     
 class OrderItem(models.Model):
     order=models.ForeignKey(Order,on_delete=models.PROTECT,related_name='items') #one to many relationship with Order  to OrderItem class 

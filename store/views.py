@@ -5,7 +5,7 @@ from django.db.models import Count
 
 from rest_framework.response import Response
 from rest_framework import status
-
+from rest_framework.exceptions import ValidationError
 from rest_framework.generics import ListCreateAPIView,RetrieveUpdateDestroyAPIView
 from rest_framework.viewsets import ModelViewSet,GenericViewSet
 
@@ -18,8 +18,8 @@ from rest_framework.mixins import CreateModelMixin,RetrieveModelMixin,DestroyMod
 
 from store.permissions import AdminOrReadOnly, ViewCustomerHistoryPermission
 
-from . models import Product,Customer,Collection,OrderItem, ProductImage,Review,Cart,CartItem,Order
-from . serializers import  ProductImageSerializer, ProductSerializer,CollectionSerializer,ReviewSerializer,CartSerializer,CartItemSerializer,AddCartItemSerializer,UpdateCartItemSerializer,CustomerSerializer,OrderSerializer,CreateOrderSerializer,UpdateOrderSerializer
+from . models import Product,Customer,Collection,OrderItem, ProductImage,Review,Cart,CartItem,Order,Address
+from . serializers import  ProductImageSerializer, ProductSerializer,CollectionSerializer,ReviewSerializer,CartSerializer,CartItemSerializer,AddCartItemSerializer,UpdateCartItemSerializer,CustomerSerializer,OrderSerializer,CreateOrderSerializer,UpdateOrderSerializer,AddressSerializer
 from . filters import ProductFilter
 from . pagination import DefaultPagination
 
@@ -192,3 +192,73 @@ class ProductImageViewSet(ModelViewSet):
   
   def get_serializer_context(self):
     return {'product_id':self.kwargs['product_pk']}
+  
+class AddressViewSet(ModelViewSet):
+    serializer_class = AddressSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        customer = Customer.objects.get(user=self.request.user)
+        return Address.objects.filter(customer=customer)
+
+    # disable normal list endpoint
+    def list(self, request, *args, **kwargs):
+        return Response(
+            {"detail": "Use /store/address/me/ endpoint"},
+            status=status.HTTP_403_FORBIDDEN
+        )
+
+    # POST /store/address/
+    def create(self, request, *args, **kwargs):
+        customer = Customer.objects.get(user=request.user)
+
+        # prevent duplicate address
+        if Address.objects.filter(customer=customer).exists():
+            raise ValidationError(
+                "Address already exists. Use PATCH /store/address/me/"
+            )
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        serializer.save(customer=customer)
+
+        return Response(serializer.data, status=201)
+
+    # GET + PATCH /store/address/me/
+    @action(detail=False, methods=["get", "patch"])
+    def me(self, request):
+        customer = Customer.objects.get(user=request.user)
+
+        address = Address.objects.filter(customer=customer).first()
+
+        # GET
+        if request.method == "GET":
+            if not address:
+                return Response(
+                    {"detail": "Address not found"},
+                    status=404
+                )
+
+            serializer = self.get_serializer(address)
+            return Response(serializer.data)
+
+        # PATCH
+        if not address:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+
+            serializer.save(customer=customer)
+
+            return Response(serializer.data, status=201)
+
+        serializer = self.get_serializer(
+            address,
+            data=request.data,
+            partial=True
+        )
+
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data)
