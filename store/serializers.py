@@ -160,17 +160,44 @@ class OrderSerializer(serializers.ModelSerializer):
         
         
 class CreateOrderSerializer(serializers.Serializer):
-    cart_id=serializers.UUIDField()
+    #cart checkout
+    cart_id=serializers.UUIDField(required=False)
     
-    def validate_cart_id(self,cart_id):
-        if  not Cart.objects.filter(pk=cart_id).exists():
-            raise serializers.ValidationError("No cart_id with this id is found!!!")
-        
-        if CartItem.objects.filter(cart_id=cart_id).count()==0:
-            raise serializers.ValidationError('Cart is Empty!!!!!')
-        return cart_id
-            
+    #Buy-Now
+    product_id=serializers.IntegerField(required=False)
+    quantity=serializers.IntegerField(required=False,default=1)
+    
+    #main validation
     def validate(self,attrs):
+        cart_id=attrs.get("cart_id")
+        product_id=attrs.get("product_id")
+        quantity=attrs.get("quantity",1)
+        
+    
+    #provide one either cart or direct product 
+    
+        if not cart_id and not product_id:
+           raise serializers.ValidationError("provide cart_id or product_id")
+    
+    
+        if cart_id:
+            if not Cart.objects.filter(pk=cart_id).exists():
+                raise serializers.ValidationError({"cart_id":"cart not found!!"})
+            
+            if CartItem.objects.filter(cart_id=cart_id).count()==0:
+                raise serializers.ValidationError({"cart_id":"cart is empty"})
+            
+    
+        if product_id:
+          if not Product.objects.filter(pk=product_id).exists():
+            raise serializers.ValidationError({"product_id":"product not found!"})
+        
+          if quantity<=0:
+            raise serializers.ValidationError({
+                {"quantity":"Qunatity must be grater or equal to 1"}
+            })
+  
+  
         customer=Customer.objects.get(user_id=self.context["user_id"])
         
         if not customer.phone:
@@ -188,21 +215,50 @@ class CreateOrderSerializer(serializers.Serializer):
        with transaction.atomic():
           customer=Customer.objects.get(user_id=self.context['user_id'])
           order=Order.objects.create(customer=customer)
+          cart_id=self.validated_data.get("cart_id")
+          product_id=self.validated_data.get("product_id")
           
-          cart_items=CartItem.objects.select_related('product').filter(cart_id=self.validated_data['cart_id'])
-          
-          order_items=[OrderItem(      #item for item in cart_items
-              order=order,
-              product=item.product,
-              unit_price=item.product.unit_price,
-              quantity=item.quantity
-              ) for item in cart_items]
-          OrderItem.objects.bulk_create(order_items)
-          
-          Cart.objects.filter(pk=self.validated_data['cart_id']).delete()
-          return order
-      
-      
+          quantity=self.validated_data.get("quantity",1)
+  
+  
+          #cart checkout
+          if cart_id:
+              cart_items=CartItem.objects.select_related("product").filter(cart_id=cart_id)
+              order_items=[
+                  OrderItem(
+                     order=order,
+                     product=item.product,
+                     unit_price=item.product.unit_price,
+                     quantity=item.quantity,
+                      
+                  )
+                  for item in cart_items
+                  
+              ]
+              OrderItem.objects.bulk_create(order_items)
+  
+              #delete cart after placing order 
+              Cart.objects.filter(
+                  pk=cart_id
+              ).delete()
+              
+          #buy now checkout
+          elif product_id:
+              product=Product.objects.get(
+                  pk=product_id
+              )
+              
+              OrderItem.objects.create(
+                  order=order,
+                  product=product,
+                  unit_price=product.unit_price,
+                  quantity=quantity
+              )
+              return order
+               
+    
+    
+    
 class UpdateOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model=Order
