@@ -167,6 +167,8 @@ class CreateOrderSerializer(serializers.Serializer):
     product_id=serializers.IntegerField(required=False)
     quantity=serializers.IntegerField(required=False,default=1)
     
+    payment_method=serializers.ChoiceField(choices=Order.PAYMENT_METHOD_CHOICES)
+    
     #main validation
     def validate(self,attrs):
         cart_id=attrs.get("cart_id")
@@ -198,7 +200,7 @@ class CreateOrderSerializer(serializers.Serializer):
             })
   
   
-        customer=Customer.objects.get(user_id=self.context["user_id"])
+        customer=Customer.objects.get(user=self.context["user"])
         
         if not customer.phone:
             raise serializers.ValidationError({
@@ -211,50 +213,8 @@ class CreateOrderSerializer(serializers.Serializer):
             })
         return attrs
     
-    def save(self,**kwargs):
-       with transaction.atomic():
-          customer=Customer.objects.get(user_id=self.context['user_id'])
-          order=Order.objects.create(customer=customer)
-          cart_id=self.validated_data.get("cart_id")
-          product_id=self.validated_data.get("product_id")
-          
-          quantity=self.validated_data.get("quantity",1)
-  
-  
-          #cart checkout
-          if cart_id:
-              cart_items=CartItem.objects.select_related("product").filter(cart_id=cart_id)
-              order_items=[
-                  OrderItem(
-                     order=order,
-                     product=item.product,
-                     unit_price=item.product.unit_price,
-                     quantity=item.quantity,
-                      
-                  )
-                  for item in cart_items
-                  
-              ]
-              OrderItem.objects.bulk_create(order_items)
-  
-              #delete cart after placing order 
-              Cart.objects.filter(
-                  pk=cart_id
-              ).delete()
-              
-          #buy now checkout
-          elif product_id:
-              product=Product.objects.get(
-                  pk=product_id
-              )
-              
-              OrderItem.objects.create(
-                  order=order,
-                  product=product,
-                  unit_price=product.unit_price,
-                  quantity=quantity
-              )
-              return order
+   
+         
                
     
     

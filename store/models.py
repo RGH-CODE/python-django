@@ -91,17 +91,58 @@ class Customer(models.Model):
     
     
 class Order(models.Model):
+    PAY_WITH_ESEWA='S'
+    PAY_WITH_CASH='COD'
+    PAYMENT_METHOD_CHOICES=[
+        (PAY_WITH_ESEWA,'esewa'),
+        (PAY_WITH_CASH,'cash on delivery'),
+    ]
+    
     PAYMENT_STATUS_PENDING='P'
     PAYMENT_STATUS_COMPLETE='C'
     PAYMENT_STATUS_FAILED='F'
+    PAYMENT_STATUS_CASH_ON_DELIVERY='COD'
     PAYMENT_STATUS_CHOICES=[
         (PAYMENT_STATUS_PENDING,'pending'),
         (PAYMENT_STATUS_COMPLETE,'complete'),
         (PAYMENT_STATUS_FAILED,'failed'),
+        (PAYMENT_STATUS_CASH_ON_DELIVERY,'cash on delivery'),
     ]
+    
+    ORDER_STATUS_PENDING='P'
+    ORDER_STATUS_CONFIRMED='C'
+    ORDER_STATUS_PROCESSING='PR'
+    ORDER_STATUS_SHIPPED='S'
+    ORDER_STATUS_DELIVERED='D'
+    ORDER_STATUS_CANCELLED='CX'
+    ORDER_STATUS_CHOICES=[
+        (ORDER_STATUS_PENDING,'pending'),
+        (ORDER_STATUS_CONFIRMED,'confirmed'),
+        (ORDER_STATUS_PROCESSING,'processing'),
+        (ORDER_STATUS_SHIPPED,'shipped'),
+        (ORDER_STATUS_DELIVERED,'delivered'),
+        (ORDER_STATUS_CANCELLED,'cancelled'),
+        
+    ]
+    
     placed_at=models.DateTimeField(auto_now_add=True)  
-    payment_status=models.CharField(max_length=1,choices=PAYMENT_STATUS_CHOICES,default=PAYMENT_STATUS_PENDING)
+    payment_method=models.CharField(max_length=20,choices=PAYMENT_METHOD_CHOICES)
+    payment_status=models.CharField(max_length=20,choices=PAYMENT_STATUS_CHOICES,default=PAYMENT_STATUS_PENDING)
+    order_status=models.CharField(max_length=20,choices=ORDER_STATUS_CHOICES,default=ORDER_STATUS_PENDING)
     customer=models.ForeignKey(Customer,on_delete=models.PROTECT)
+    cached_total_price = models.DecimalField(
+    max_digits=10,
+    decimal_places=2,
+    default=0
+)
+    transaction_id=models.CharField(max_length=255,null=True,blank=True)
+    
+    @property
+    def total_price(self):
+        return sum(
+            item.unit_price * item.quantity
+            for item in self.items.all()
+        )
     
     def __str__(self):
         if self.customer and self.customer.first_name:

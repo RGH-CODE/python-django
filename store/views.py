@@ -1,29 +1,25 @@
 from django.shortcuts import render
+from django.conf import settings
+
 from django.shortcuts import get_object_or_404
-
 from django.db.models import Count
-
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import ListCreateAPIView,RetrieveUpdateDestroyAPIView
 from rest_framework.viewsets import ModelViewSet,GenericViewSet
-
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter,OrderingFilter
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated,AllowAny,IsAdminUser
-
 from rest_framework.mixins import CreateModelMixin,RetrieveModelMixin,DestroyModelMixin,UpdateModelMixin
-
 from store.permissions import AdminOrReadOnly, ViewCustomerHistoryPermission
-
 from . models import Product,Customer,Collection,OrderItem, ProductImage,Review,Cart,CartItem,Order,Address
 from . serializers import  ProductImageSerializer, ProductSerializer,CollectionSerializer,ReviewSerializer,CartSerializer,CartItemSerializer,AddCartItemSerializer,UpdateCartItemSerializer,CustomerSerializer,OrderSerializer,CreateOrderSerializer,UpdateOrderSerializer,AddressSerializer
 from . filters import ProductFilter
 from . pagination import DefaultPagination
-
-
+from .services import OrderService
+from payments.esewa import generate_esewa_payload
 class ProductViewSet(ModelViewSet):
   queryset=Product.objects.prefetch_related('images').all()
   serializer_class=ProductSerializer
@@ -156,16 +152,17 @@ class OrderViewSet(ModelViewSet):
             return [IsAdminUser()]
         return [IsAuthenticated()]
     
-    def create(self, request, *args, **kwargs):
-        serializer = CreateOrderSerializer(
-            data=request.data,
-            context={'user_id': self.request.user.id}
+    def get_queryset(self):
+        user = self.request.user
+        qs=Order.objects.prefetch_related("items__product")
+        if user.is_staff:
+            return qs
+        
+        # Fixed to avoid DoesNotExist error
+        return qs.filter(
+            customer__user_id=user.id
         )
-        serializer.is_valid(raise_exception=True)
-        order = serializer.save()
-        serializer = OrderSerializer(order)
-        return Response(serializer.data)
-    
+        
     def get_serializer_class(self):
         if self.request.method == 'POST':
             return CreateOrderSerializer
@@ -173,15 +170,54 @@ class OrderViewSet(ModelViewSet):
             return UpdateOrderSerializer
         return OrderSerializer
     
-    def get_queryset(self):
-        user = self.request.user
+    
+    
+    def create(self, request, *args, **kwargs):
+        serializer = CreateOrderSerializer(
+            data=request.data,
+            context={'user': self.request.user}
+        )
+        serializer.is_valid(raise_exception=True)
+        order = OrderService.create_order(
+        serializer.validated_data,
+        request.user)
         
-        if user.is_staff:
-            return Order.objects.prefetch_related('items__product').all()
+        payment_method = serializer.validated_data.get("payment_method")
         
-        # Fixed to avoid DoesNotExist error
-        return Order.objects.prefetch_related('items__product').filter(
-            customer__user_id=user.id
+        if payment_method==Order.PAY_WITH_CASH:
+            order.payment_method=Order.PAY_WITH_CASH
+            order.payment_status=Order.PAYMENT_STATUS_CASH_ON_DELIVERY
+            order.order_status=Order.ORDER_STATUS_CONFIRMED
+            order.save
+            
+            return Response({
+                "order_id":order.id,
+                 "payment_method":"COD",
+                 "payment_status":"CASH_ON_DELIVERY",
+                 "order_status":"CONFIRMED",
+                 "message":"Order places Successfully",
+            
+            })
+        
+        
+        if payment_method==Order.PAY_WITH_ESEWA:
+            order.payment_method=Order.PAY_WITH_ESEWA
+            order.payment_status=Order.PAYMENT_STATUS_PENDING
+            order.save
+            
+            payload = generate_esewa_payload(order)
+            
+            return Response({
+    "payment_method": "ESEWA",
+    "payload": payload,
+    "payment_url": settings.ESEWA_PAYMENT_URL
+})
+            
+        return Response(
+            {
+                "error":"Invalid Payment Method"
+            },
+            status=400
         )
     
 class ProductImageViewSet(ModelViewSet):

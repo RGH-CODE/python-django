@@ -70,6 +70,7 @@ INSTALLED_APPS = [
     'tag',
     'likes',
     'core',
+    'payments',
     "corsheaders",
     'cloudinary',
     'cloudinary_storage',
@@ -215,7 +216,7 @@ EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True").lower() in ("true", "1", "t")
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
 
-FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:5173')
+FRONTEND_URL = os.getenv('FRONTEND_URL')
 
 EMAIL_TIMEOUT = 30
 
@@ -299,3 +300,9 @@ CLOUDINARY_STORAGE = {
     'API_KEY': os.environ.get("CLOUDINARYAPIKEY"),
     'API_SECRET': os.environ.get("CLOUDINARYSECRETKEY"),
 }
+
+
+
+ESEWA_MERCHANT_ID = os.environ.get("ESEWA_MERCHANT_ID")
+ESEWA_SECRET_KEY = os.environ.get("ESEWA_SECRET_KEY")
+ESEWA_PAYMENT_URL=os.environ.get("ESEWA_PAYMENT_URL")
