@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.conf import settings
-
+from django.core.cache import cache
 from django.shortcuts import get_object_or_404
 from django.db.models import Count
 from rest_framework.response import Response
@@ -20,27 +20,139 @@ from . filters import ProductFilter
 from . pagination import DefaultPagination
 from .services import OrderService
 from payments.esewa import generate_esewa_payload
+from django.core.cache import cache
+
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter, OrderingFilter
+
+from rest_framework.viewsets import ModelViewSet
+from rest_framework.response import Response
+from rest_framework import status
+
 class ProductViewSet(ModelViewSet):
-  queryset=Product.objects.prefetch_related('images').all()
-  serializer_class=ProductSerializer
-  filter_backends=[DjangoFilterBackend,SearchFilter,OrderingFilter]
-  filterset_class=ProductFilter
-  pagination_class=DefaultPagination
-  search_fields=['title','description']
-  ordering_fields=['unit_price','last_update']
-  permission_classes=[AdminOrReadOnly]
-  
-  
-  def get_serializer_context(self):
-      return {'request':self.request}
-  
-  
-  
-  def destroy(self,request ,*args,**kwargs):
-      if OrderItem.objects.filter(product_id=kwargs['pk']).count()>0:
-        return Response({'error':'This product can not be deleted cause it is related with order item'},status=status.HTTP_405_METHOD_NOT_ALLOWED)
-      return super().destroy(request,*args,**kwargs)
-    
+
+    queryset = Product.objects.all()\
+        .select_related()\
+        .prefetch_related("images")
+
+    serializer_class = ProductSerializer
+
+    filter_backends = [
+        DjangoFilterBackend,
+        SearchFilter,
+        OrderingFilter
+    ]
+
+    filterset_class = ProductFilter
+
+    pagination_class = DefaultPagination
+
+    search_fields = [
+        "title",
+        "description"
+    ]
+
+    ordering_fields = [
+        "unit_price",
+        "last_update"
+    ]
+
+    permission_classes = [AdminOrReadOnly]
+
+    def get_serializer_context(self):
+        return {
+            "request": self.request
+        }
+
+    def list(self, request, *args, **kwargs):
+
+        cache_key = (
+            f"products_"
+            f"{request.GET.urlencode()}"
+        )
+
+        cached_data = cache.get(cache_key)
+
+        if cached_data:
+            return Response(cached_data)
+
+        queryset = self.filter_queryset(
+            self.get_queryset()
+        )
+
+        page = self.paginate_queryset(queryset)
+
+        if page is not None:
+
+            serializer = self.get_serializer(
+                page,
+                many=True
+            )
+
+            paginated_response = (
+                self.get_paginated_response(
+                    serializer.data
+                )
+            )
+
+            cache.set(
+                cache_key,
+                paginated_response.data,
+                timeout=60 * 5
+            )
+
+            return paginated_response
+
+        serializer = self.get_serializer(
+            queryset,
+            many=True
+        )
+
+        cache.set(
+            cache_key,
+            serializer.data,
+            timeout=60 * 5
+        )
+
+        return Response(serializer.data)
+
+    def perform_create(self, serializer):
+
+        serializer.save()
+
+        cache.clear()
+
+    def perform_update(self, serializer):
+
+        serializer.save()
+
+        cache.clear()
+
+    def perform_destroy(self, instance):
+
+        cache.clear()
+
+        instance.delete()
+
+    def destroy(self, request, *args, **kwargs):
+
+        if OrderItem.objects.filter(
+            product_id=kwargs["pk"]
+        ).exists():
+
+            return Response(
+                {
+                    "error":
+                    "This product cannot be deleted because it is related to an order item."
+                },
+                status=status.HTTP_405_METHOD_NOT_ALLOWED
+            )
+
+        return super().destroy(
+            request,
+            *args,
+            **kwargs
+        )
     #'''#->we implemented above destroy function instead of this below cause we can only product detail to allow deleted not product list .this destroy function is built in function '''
     # def delete(self,request,pk):
     #   product=get_object_or_404(Product,pk=pk)
@@ -54,20 +166,122 @@ class ProductViewSet(ModelViewSet):
   
 #Building viewset to related class collectionlist and collectiondetail
 class CollectionViewSet(ModelViewSet):
-   queryset=Collection.objects.annotate(products_count=Count('products')).all()
-   serializer_class=CollectionSerializer
-  
-   def get_permissions(self):
-        if self.action in ['list', 'retrieve']:
+
+    queryset = Collection.objects.annotate(
+        products_count=Count("products")
+    )
+
+    serializer_class = CollectionSerializer
+
+    def get_permissions(self):
+
+        if self.action in [
+            "list",
+            "retrieve"
+        ]:
             return [AllowAny()]
+
         return [IsAdminUser()]
-      
-      
-   def destroy(self ,request,*args,**kwargs):
-      if OrderItem.objects.filter(product_id=kwargs['pk']).count()>0:
-        return Response({'error':'This collection can not be deleted cause it is related with order item'},status=status.HTTP_405_METHOD_NOT_ALLOWED)
-      return super().destroy(request,*args,**kwargs)
-  
+
+    def list(self, request, *args, **kwargs):
+
+        cache_key = "collections_list"
+
+        cached_data = cache.get(cache_key)
+
+        if cached_data:
+            return Response(cached_data)
+
+        queryset = self.get_queryset()
+
+        serializer = self.get_serializer(
+            queryset,
+            many=True
+        )
+
+        cache.set(
+            cache_key,
+            serializer.data,
+            timeout=60 * 10
+        )
+
+        return Response(serializer.data)
+
+    def retrieve(self, request, *args, **kwargs):
+
+        pk = kwargs["pk"]
+
+        cache_key = f"collection_{pk}"
+
+        cached_data = cache.get(cache_key)
+
+        if cached_data:
+            return Response(cached_data)
+
+        collection = self.get_object()
+
+        serializer = self.get_serializer(
+            collection
+        )
+
+        cache.set(
+            cache_key,
+            serializer.data,
+            timeout=60 * 10
+        )
+
+        return Response(serializer.data)
+
+    def perform_create(self, serializer):
+
+        serializer.save()
+
+        cache.delete("collections_list")
+
+    def perform_update(self, serializer):
+
+        instance = serializer.save()
+
+        cache.delete("collections_list")
+
+        cache.delete(
+            f"collection_{instance.id}"
+        )
+
+    def perform_destroy(self, instance):
+
+        cache.delete("collections_list")
+
+        cache.delete(
+            f"collection_{instance.id}"
+        )
+
+        instance.delete()
+
+    def destroy(
+        self,
+        request,
+        *args,
+        **kwargs
+    ):
+
+        if OrderItem.objects.filter(
+            product__collection_id=kwargs["pk"]
+        ).exists():
+
+            return Response(
+                {
+                    "error":
+                    "This collection cannot be deleted because it contains products related to order items."
+                },
+                status=status.HTTP_405_METHOD_NOT_ALLOWED
+            )
+
+        return super().destroy(
+            request,
+            *args,
+            **kwargs
+        )
   
   #  def delete(self,request,id):
   #     collection=get_object_or_404(Collection,pk=pk)

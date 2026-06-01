@@ -246,7 +246,7 @@ CELERY_BEAT_SCHEDULE = {
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/2",
+        "LOCATION":os.environ.get("REDIS_URL"),
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
@@ -306,3 +306,5 @@ CLOUDINARY_STORAGE = {
 ESEWA_MERCHANT_ID = os.environ.get("ESEWA_MERCHANT_ID")
 ESEWA_SECRET_KEY = os.environ.get("ESEWA_SECRET_KEY")
 ESEWA_PAYMENT_URL=os.environ.get("ESEWA_PAYMENT_URL")
+
+
